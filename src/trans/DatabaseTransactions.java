@@ -307,8 +307,30 @@ public class DatabaseTransactions {
 		// Use the con instance variable for the JDBC connection.
 		// Make sure to commit() if success or rollback if exception or account is not
 		// found.
+		try{
+			PreparedStatement stmt = con.prepareStatement("SELECT amount FROM Account WHERE acctId = ?");
+			stmt.setInt(1, acctId);
+			System.out.println("Returning balance in account.");
+			ResultSet rs = stmt.executeQuery();
+			if (!rs.next()) {
+				con.rollback();
+				throw new SQLException("No account records found.");
+			}
+			int[] values = new int[2];
+			int value = (int) rs.getInt(1);
+			values[0] = value;
 
-		return 0;
+
+			System.out.println("Update executed.");	
+
+			System.out.println("Committing update.");
+			con.commit();
+			System.out.println("Update committed.");
+			return value;
+		}catch(SQLException e){
+			con.rollback();
+			throw new SQLException("Account " + acctId + " not found.");
+		}
 	}
 
 	/**
