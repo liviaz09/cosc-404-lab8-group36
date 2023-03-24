@@ -384,7 +384,7 @@ public class DatabaseTransactions {
 	 * con.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED + 4094);
 	 */
 
-	public void setIsolationLevelTest1(Connection con) throws SQLException {
+	public void setIsolationLevelTest1(Connection con) throws SQLException, InterruptedException {
 		// TODO: Set isolation level of connection so that the following
 		/*
 		 * Submitted sequence of operations:
@@ -398,6 +398,8 @@ public class DatabaseTransactions {
 		 * - Expected output: First value: 2578180 Second value: 5577160
 		 * - Read query 2 must not be blocked waiting on update.
 		 */
+		con.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
+
 
 	}
 
@@ -416,6 +418,7 @@ public class DatabaseTransactions {
 		 * - Read query 2 must not be blocked waiting on update.
 		 * - Update must not be blocked on read.
 		 */
+		con.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED + 4094);
 	}
 
 	public void setIsolationLevelTest3(Connection con) throws SQLException {
@@ -434,7 +437,7 @@ public class DatabaseTransactions {
 		 * - Update is not blocked waiting for read.
 		 */
 		// Note: This is an example. It is not correct.																			
-		con.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE); 
+		con.setTransactionIsolation((Connection.TRANSACTION_READ_COMMITTED));
 	}
 
 	public void setIsolationLevelTest4(Connection con) throws SQLException {
@@ -452,6 +455,7 @@ public class DatabaseTransactions {
 		 * - Read query 2 must not be blocked waiting on update.
 		 * - Update IS blocked waiting for read.
 		 */
+		con.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
 	}
 
 	public void setIsolationLevelTest5(Connection con) throws SQLException {
@@ -468,6 +472,7 @@ public class DatabaseTransactions {
 		 * - Read query 2 must not be blocked waiting on update.
 		 * - Update IS blocked waiting for read.
 		 */
+		con.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
 	}
 
 	/*
