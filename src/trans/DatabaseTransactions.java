@@ -351,12 +351,36 @@ public class DatabaseTransactions {
 
 		try {
 			// TODO: Retrieve information on first account
+			PreparedStatement stmt = con.prepareStatement("SELECT * FROM Account WHERE acctId = ?");
+			stmt.setInt(1, acctFrom);
+			System.out.println("Returning information in account.");
+			ResultSet rs = stmt.executeQuery();
+
 			// TODO: Throw the following exception if the account is not found:
 			// throw new SQLException("Account "+acctId+" not found.");
+			if (!rs.next()) {
+				con.rollback();
+				throw new SQLException("Account "+acctFrom+" not found.");
+			}
+
+			System.out.println("Committing update.");
+			con.commit();
+			System.out.println("Update committed.");
 
 			// TODO: Retrieve information on second account
 			// TODO: Throw the following exception if the account is not found:
 			// throw new SQLException("Account "+acctId+" not found.");
+			stmt.setInt(1, acctTo);
+			System.out.println("Returning information in account.");
+			ResultSet rs2 = stmt.executeQuery();
+
+			if (!rs2.next()) {
+				con.rollback();
+				throw new SQLException("Account "+acctTo+" not found.");
+			}
+			System.out.println("Committing update.");
+			con.commit();
+			System.out.println("Update committed.");
 
 			// TODO: Verify accounts belong to same customer id
 			// TODO: Throw the following exception if the accounts do not belong to the same
@@ -364,12 +388,55 @@ public class DatabaseTransactions {
 			// throw new SQLException("Transfer failed because accounts do not belong to
 			// same customer.");
 
+			int fromCid = rs.getInt(2); 
+			System.out.println("hi.");
+			int toCid = rs2.getInt(2);
+
+			if(fromCid != toCid){
+				con.rollback();
+				throw new SQLException("Transfer failed because accounts do not belong to same customer.");
+			}
+			System.out.println("Committing update.");
+			con.commit();
+			System.out.println("Update committed.");
+
 			// TODO: Verify that have sufficient funds to perform transfer
 			// TODO: Throw the following exception if there are insufficient funds to
 			// perform the transfer
 			// throw new SQLException("Transfer failed because of insufficient balance.");
+			int fromvalue = rs.getInt(3);
+
+			if(fromvalue < amount){
+				con.rollback();
+				throw new SQLException("Transfer failed because of insufficient balance.");
+			}
+
+			System.out.println("Committing update.");
+			con.commit();
+			System.out.println("Update committed.");
 
 			// TODO: Update balances and commit transaction
+			PreparedStatement stmt2 = con.prepareStatement("UPDATE Account SET amount = ? WHERE acctId = ?");
+
+			int tovalue = rs2.getInt(3);
+			
+			int frombalance = fromvalue - amount;
+			int tobalance = tovalue + amount;
+
+			stmt2.setInt(1, frombalance);
+			stmt2.setInt(2, acctFrom);
+
+			stmt2.setInt(1, tobalance);
+			stmt2.setInt(2, acctTo);
+
+			System.out.println("Updating balance in account.");
+			stmt.executeUpdate();
+			System.out.println("Update executed.");
+
+			System.out.println("Committing update.");
+			con.commit();
+			System.out.println("Update committed.");
+
 
 		} catch (Exception e) {
 			con.rollback();
